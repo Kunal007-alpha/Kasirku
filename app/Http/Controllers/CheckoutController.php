@@ -8,6 +8,7 @@ use App\Models\Payment;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 use Midtrans\Config;
 use Midtrans\Snap;
@@ -49,9 +50,9 @@ class CheckoutController extends Controller
         'status' => 'pending',
       ]);
 
-      $totalAmount = 0;
+      $subtotalAmount = 0;
 
-      // Create order items
+      // Create order items and calculate subtotal
       foreach ($request->cart as $cartItem) {
         $product = Product::findOrFail($cartItem['product']['id']);
 
@@ -62,8 +63,12 @@ class CheckoutController extends Controller
           'notes' => $cartItem['notes'] ?? null,
         ]);
 
-        $totalAmount += $product->price * $cartItem['quantity'];
+        $subtotalAmount += $product->price * $cartItem['quantity'];
       }
+
+      // Calculate tax (10%) and total amount
+      $taxAmount = $subtotalAmount * 0.1;
+      $totalAmount = $subtotalAmount + $taxAmount;
 
       // Create payment record
       $payment = Payment::create([
@@ -87,21 +92,39 @@ class CheckoutController extends Controller
           'email' => 'customer@kasirku.com',
           'phone' => '08123456789',
         ],
-        'item_details' => collect($request->cart)->map(function ($cartItem) {
-          $product = Product::find($cartItem['product']['id']);
-          return [
-            'id' => $product->id,
-            'price' => (int) $product->price,
-            'quantity' => $cartItem['quantity'],
-            'name' => $product->name,
-          ];
-        })->toArray(),
+        'item_details' => array_merge(
+          collect($request->cart)->map(function ($cartItem) {
+            $product = Product::find($cartItem['product']['id']);
+            return [
+              'id' => $product->id,
+              'price' => (int) $product->price,
+              'quantity' => $cartItem['quantity'],
+              'name' => $product->name,
+            ];
+          })->toArray(),
+          [
+            [
+              'id' => 'TAX',
+              'price' => (int) $taxAmount,
+              'quantity' => 1,
+              'name' => 'Pajak (10%)',
+            ]
+          ]
+        ),
         'callbacks' => [
           'finish' => route('checkout.finish'),
           'unfinish' => route('checkout.unfinish'),
           'error' => route('checkout.error'),
         ],
       ];
+
+      // Log the calculation breakdown
+      Log::info('Order Total Calculation:', [
+        'subtotal' => $subtotalAmount,
+        'tax_amount' => $taxAmount,
+        'total_amount' => $totalAmount,
+        'tax_percentage' => '10%'
+      ]);
 
       $snapToken = Snap::getSnapToken($params);
 

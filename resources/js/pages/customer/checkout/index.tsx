@@ -121,8 +121,16 @@ export default function CheckoutIndex() {
     };
 
     // Calculate totals
-    const getTotalPrice = () => {
+    const getSubtotal = () => {
         return cart.reduce((total, item) => total + item.product.price * item.quantity, 0);
+    };
+
+    const getTaxAmount = () => {
+        return getSubtotal() * 0.1; // 10% tax
+    };
+
+    const getTotalPrice = () => {
+        return getSubtotal() + getTaxAmount();
     };
 
     const getTotalItems = () => {
@@ -323,8 +331,13 @@ export default function CheckoutIndex() {
                                 <div className="space-y-2">
                                     <div className="flex justify-between text-sm">
                                         <span>Subtotal ({getTotalItems()} item)</span>
-                                        <span>{formatCurrency(getTotalPrice())}</span>
+                                        <span>{formatCurrency(getSubtotal())}</span>
                                     </div>
+                                    <div className="flex justify-between text-sm">
+                                        <span>Pajak (10%)</span>
+                                        <span>{formatCurrency(getTaxAmount())}</span>
+                                    </div>
+                                    <Separator />
                                     <div className="flex justify-between text-lg font-semibold">
                                         <span>Total</span>
                                         <span className="text-green-600">{formatCurrency(getTotalPrice())}</span>
