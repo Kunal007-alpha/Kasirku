@@ -28,7 +28,6 @@ class ProductController extends Controller
                     });
             });
         }
-
         // Apply category filter
         if ($request->has('category') && $request->category && $request->category !== 'all') {
             $query->where('category_id', $request->category);
