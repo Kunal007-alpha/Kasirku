@@ -3,6 +3,7 @@
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\OrderController;
 use App\Http\Controllers\PrintController;
 use App\Http\Controllers\ProductController;
 use Illuminate\Support\Facades\Route;
@@ -27,7 +28,7 @@ Route::prefix('order')->group(function () {
 });
 
 // !important: This route will be using middleware 'auth' and 'verified' in the admin prefix group
-Route::get('/print', [PrintController::class, 'index'])->name('print.index');
+Route::POST('/print', [PrintController::class, 'index'])->name('print.index');
 
 Route::prefix('admin')->middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', function () {
@@ -39,7 +40,14 @@ Route::prefix('admin')->middleware(['auth', 'verified'])->group(function () {
 
     // Resource route for ProductController
     Route::resource('products', ProductController::class);
-});
 
+    // Order routes (using modals, so only need index, store, update, destroy)
+    Route::get('orders', [OrderController::class, 'index'])->name('orders.index');
+    Route::post('orders', [OrderController::class, 'store'])->name('orders.store');
+    Route::put('orders/{order}', [OrderController::class, 'update'])->name('orders.update');
+    Route::delete('orders/{order}', [OrderController::class, 'destroy'])->name('orders.destroy');
+    Route::post('orders/{order}/update-status', [OrderController::class, 'updateStatus'])->name('orders.update-status');
+    Route::get('orders/{order}/print', [OrderController::class, 'printReceipt'])->name('orders.print');
+});
 require __DIR__ . '/settings.php';
 require __DIR__ . '/auth.php';

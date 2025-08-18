@@ -77,10 +77,8 @@ export default function CheckoutIndex() {
 
         const snapScript = document.createElement('script');
         // Use correct URL based on environment
-        snapScript.src = isProduction 
-            ? 'https://app.midtrans.com/snap/snap.js'
-            : 'https://app.sandbox.midtrans.com/snap/snap.js';
-        
+        snapScript.src = isProduction ? 'https://app.midtrans.com/snap/snap.js' : 'https://app.sandbox.midtrans.com/snap/snap.js';
+
         snapScript.setAttribute('data-client-key', clientKey);
 
         snapScript.onload = () => {
