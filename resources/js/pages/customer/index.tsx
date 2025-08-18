@@ -5,7 +5,7 @@ import { Carousel, CarouselContent, CarouselIndicators, CarouselItem, CarouselNe
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Head } from '@inertiajs/react';
+import { Head, router } from '@inertiajs/react';
 import { ImageIcon, Minus, Plus, SearchIcon, ShoppingCart, Trash2 } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
@@ -243,6 +243,20 @@ export default function CustomerIndex({ products: initialProducts, categories, p
         return cartItem ? cartItem.quantity : 0;
     };
 
+    const goToCheckout = () => {
+        console.log('Going to checkout with cart:', cart);
+
+        // Save current cart to localStorage before navigation
+        localStorage.setItem('kasirku_cart', JSON.stringify(cart));
+
+        // Verify cart was saved
+        const savedCart = localStorage.getItem('kasirku_cart');
+        console.log('Cart saved to localStorage:', savedCart);
+
+        setIsCartModalOpen(false);
+        router.visit('/checkout');
+    };
+
     return (
         <div className="min-h-screen bg-background">
             <Head title="Kasirku - Menu" />
@@ -353,7 +367,9 @@ export default function CustomerIndex({ products: initialProducts, categories, p
                                             <Button variant="outline" className="w-full" onClick={clearCart}>
                                                 Kosongkan Keranjang
                                             </Button>
-                                            <Button className="w-full">Lanjut ke Checkout ({getTotalItems()} item)</Button>
+                                            <Button className="w-full" onClick={goToCheckout}>
+                                                Lanjut ke Checkout ({getTotalItems()} item)
+                                            </Button>
                                         </>
                                     )}
                                 </DialogFooter>
