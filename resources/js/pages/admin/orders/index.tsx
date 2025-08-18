@@ -516,7 +516,7 @@ export default function OrdersIndex({ orders, products, filters }: Props) {
                 setIsEditModalOpen(false);
                 setSelectedOrder(null);
                 resetForm();
-                
+
                 // Reload to get updated data
                 window.location.reload();
             } else {
@@ -555,7 +555,7 @@ export default function OrdersIndex({ orders, products, filters }: Props) {
                 console.log('Order deleted successfully');
                 setIsDeleteModalOpen(false);
                 setSelectedOrder(null);
-                
+
                 // Reload to get updated data
                 window.location.reload();
             } else {
@@ -1086,7 +1086,7 @@ export default function OrdersIndex({ orders, products, filters }: Props) {
 
                                             <div className="flex items-center justify-between">
                                                 <span>Type:</span>
-                                                <Badge variant="outline">{selectedOrder.order_type === 'admin_created' ? 'Admin' : 'Customer'}</Badge>
+                                                <Badge variant="outline">{selectedOrder.order_type === 'admin' ? 'Admin' : 'Customer'}</Badge>
                                             </div>
 
                                             <div className="flex items-center gap-2 text-sm text-muted-foreground">
